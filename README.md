@@ -1,25 +1,28 @@
-# Bio-Inspired Lateral Line AUV Simulation
+# Lateral Line AUV Simulation
 
-A ROS 2 Humble and Gazebo Sim project implementing a bio-inspired lateral line sensor array and reactive navigation controller for an Autonomous Underwater Vehicle (AUV).
+A production-grade ROS 2 Humble C++ (`ament_cmake`) architecture for an Autonomous Underwater Vehicle (AUV) simulation. This project processes simulated lateral line pressure arrays through an exponential moving average (EMA) filter and publishes optimized velocity commands (`geometry_msgs/msg/Twist`).
 
-## System Overview
+## Features
 
-This package simulates an underwater vehicle equipped with a simulated lateral line pressure sensing system. It bridges physics simulation in Gazebo Sim (Garden) with real-time visualization in RViz2, featuring reactive obstacle avoidance and custom telemetry nodes.
+- **High-Performance C++ Architecture:** Refactored from Python for production-grade speed, exception safety, and deterministic memory management.
+- **Dynamic Configuration:** Live-tunable parameters (`alpha`, `max_steering`, `surge_velocity`) via YAML configuration files.
+- **Optimized QoS Profiles:** Leverages `rclcpp::SensorDataQoS` for robust, low-latency sensor data handling.
+- **Unified Launch System:** Spin up the entire simulation pipeline with a single launch file.
+- **Automated Unit Testing:** Integrated Google Test (`gtest`) suite validating core signal processing and mathematical constraints.
 
-* **`sensor_node`**: Processes pressure telemetry and publishes marker arrays (`/lateral_line/markers`) and pressure data (`/lateral_line/pressures`).
-* **`controller_node`**: Listens to sensor inputs, applies exponential moving average (EMA) filtering, and computes steering commands (`/cmd_vel`).
-* **`sim.launch.py`**: Orchestrates the concurrent startup of Gazebo Sim, robot state publishing, and RViz2 visualization.
+---
 
-## Tech Stack
+## Prerequisites
 
-* **ROS 2 Humble**
-* **Gazebo Sim (Garden)**
-* **RViz2**
-* **Python / Xacro / URDF**
+- **OS:** Ubuntu 22.04 LTS
+- **Middleware:** ROS 2 Humble Hawksbill
+- **Build Tool:** Colcon & CMake
 
-## Quick Start Guide
+---
 
-1. Clone the repository into your ROS 2 workspace source directory:
+## Installation & Build
+
+1. Clone or place this package inside your ROS 2 workspace `src/` directory:
    ```bash
    cd ~/ros2_ws/src
-   git clone [https://github.com/articlesmli/lateral_line_AUV.git](https://github.com/articlesmli/lateral_line_AUV.git)
+   # (Assuming lateral_line_auv is already located here)
