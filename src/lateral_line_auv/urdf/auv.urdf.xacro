@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<robot name="lateral_line_auv" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Base Link / Hull -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+      <geometry>
+        <cylinder length="1.0" radius="0.15"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0.0 0.2 0.8 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+      <geometry>
+        <cylinder length="1.0" radius="0.15"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.056" ixy="0.0" ixz="0.0" iyy="0.445" iyz="0.0" izz="0.445"/>
+    </inertial>
+  </link>
+
+  <!-- Native Gazebo Sim PBR / Phong Material Tag -->
+  <gazebo reference="base_link">
+    <visual>
+      <material>
+        <ambient>0.0 0.2 0.8 1.0</ambient>
+        <diffuse>0.0 0.2 0.8 1.0</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+      </material>
+    </visual>
+  </gazebo>
+
+</robot>
