@@ -1,65 +1,74 @@
-import os
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
-import xacro
+from launch.actions import EmitEvent, RegisterEventHandler
+from launch_ros.actions import LifecycleNode, Node
+from launch_ros.events.lifecycle import ChangeState
+from launch_ros.event_handlers import OnStateTransition
+import lifecycle_msgs.msg
 
 def generate_launch_description():
-    pkg_share = get_package_share_directory('lateral_line_auv')
-    
-    # Locate and process URDF/Xacro file
-    xacro_file = os.path.join(pkg_share, 'urdf', 'auv.urdf.xacro')
-    robot_description_config = xacro.process_file(xacro_file)
-    robot_description = {'robot_description': robot_description_config.toxml()}
-
-    # Start Gazebo Sim Server/Client
-    gz_sim_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('ros_gz_sim'), 'launch', 'gz_sim.launch.py')
-        ),
-        launch_arguments={'gz_args': 'empty.sdf -r'}.items()
-    )
-
-    # Robot State Publisher
-    robot_state_publisher_node = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
+    # Define the lifecycle controller node
+    controller_node = LifecycleNode(
+        package='lateral_line_auv',
+        executable='controller_node',
+        name='controller_node',
+        namespace='',
         output='screen',
-        parameters=[robot_description]
+        parameters=[{'alpha': 0.2, 'max_steering': 0.3, 'surge_velocity': 0.5}]
     )
 
-    # Spawn AUV into Gazebo
-    spawn_entity = Node(
-        package='ros_gz_sim',
-        executable='create',
-        output='screen',
-        arguments=['-topic', 'robot_description',
-                   '-name', 'lateral_line_auv',
-                   '-z', '1.5']
-    )
-
-    # Sensor Node
+    # Standard sensor node
     sensor_node = Node(
         package='lateral_line_auv',
         executable='sensor_node',
-        name='lateral_line_sensor_node',
+        name='sensor_node',
         output='screen'
     )
 
-    # Controller Node
-    controller_node = Node(
-        package='lateral_line_auv',
-        executable='controller_node',
-        name='auv_nav_controller',
-        output='screen'
+    # Automatically trigger 'configure' once the node spawns
+    to_configure_transition = EmitEvent(
+        event=ChangeState(
+            lifecycle_node_matcher=controller_node,
+            transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+        )
+    )
+
+    # Automatically trigger 'activate' once the node reaches the 'inactive' state
+    activate_handler = RegisterEventHandler(
+        OnStateTransition(
+            target_lifecycle_node=controller_node,
+            start_state='configuring',
+            goal_state='inactive',
+            entities=[
+                EmitEvent(
+                    event=ChangeState(
+                        lifecycle_node_matcher=controller_node,
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )
+                )
+            ]
+        )
+    )
+
+    # Trigger configuration right after startup
+    configure_handler = RegisterEventHandler(
+        OnStateTransition(
+            target_lifecycle_node=controller_node,
+            start_state='unconfigured',
+            goal_state='unconfigured',
+            entities=[]
+        )
     )
 
     return LaunchDescription([
-        gz_sim_launch,
-        robot_state_publisher_node,
-        spawn_entity,
         sensor_node,
-        controller_node
+        controller_node,
+        RegisterEventHandler(
+            OnStateTransition(
+                target_lifecycle_node=controller_node,
+                start_state='unknown',
+                goal_state='unconfigured',
+                entities=[to_configure_transition]
+            )
+        ),
+        activate_handler
     ])
