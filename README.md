@@ -23,6 +23,10 @@ A production-grade ROS 2 Humble C++ (`ament_cmake`) architecture for an Autonomo
 ## Installation & Build
 1. Clone or place this package inside your ROS 2 workspace `src/` directory:
    ```bash
+  cd ~/ros2_ws/src
+   # (Assuming lateral_line_auv is already located here)
+   
+---
 
 ## It is production-ready for an advanced simulation environment, but deploying it to physical AUV hardware requires several critical additions to ensure absolute safety and reliability in the field. What is Missing for Real-World Deployment:
 
@@ -36,5 +40,3 @@ A production-grade ROS 2 Humble C++ (`ament_cmake`) architecture for an Autonomo
 
 - **CI/CD Automation:** Setting up a GitHub Actions workflow to automatically run your Google Test suite and build checks on every push to catch regressions early
 
-   cd ~/ros2_ws/src
-   # (Assuming lateral_line_auv is already located here)
