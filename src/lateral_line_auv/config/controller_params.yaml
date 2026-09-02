@@ -1,0 +1,5 @@
+controller_node:
+  ros__parameters:
+    alpha: 0.2
+    max_steering: 0.3
+    surge_velocity: 0.5
