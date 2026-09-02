@@ -21,14 +21,15 @@ A production-grade ROS 2 Humble C++ (`ament_cmake`) architecture for an Autonomo
 ---
 
 ## Installation & Build
+
 1. Clone or place this package inside your ROS 2 workspace `src/` directory:
    ```bash
-  cd ~/ros2_ws/src
+   cd ~/ros2_ws/src
    # (Assuming lateral_line_auv is already located here)
    
 ---
 
-## It is production-ready for an advanced simulation environment, but deploying it to physical AUV hardware requires several critical additions to ensure absolute safety and reliability in the field. What is Missing for Real-World Deployment:
+### It is production-ready for an advanced simulation environment, but deploying it to physical AUV hardware requires several critical additions to ensure absolute safety and reliability in the field. What is Missing for Real-World Deployment:
 
 - **ROS 2 Lifecycle Management (rclcpp_lifecycle):** Real robots require managed nodes with distinct states (Unconfigured, Inactive, Active, Finalized) so ground control can safely configure and activate systems sequentially.
 
